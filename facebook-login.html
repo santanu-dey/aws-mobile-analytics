@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta charset="UTF-8">
+	<title>AWS Analytics App</title>
+	
+	<script src="https://openui5.hana.ondemand.com/resources/sap-ui-core.js" type="text/javascript"
+		id="sap-ui-bootstrap"
+		data-sap-ui-theme="sap_bluecrystal"
+		data-sap-ui-libs="sap.m">
+	</script>
+
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.2.30.min.js"></script>
+	<script src="/js/aws-sdk-mobile-analytics.min.js"></script>
+
+
+	<script type="text/javascript">
+	// Fiory Application code
+		sap.ui.getCore().attachInit(function () {
+			// create a mobile app and display page1 initially
+			var app = new sap.m.App("AWSAnalyticsApp", {
+				initialPage: "LoginPage"
+			});
+			
+
+			// create the login page
+			var login = new sap.m.Page("LoginPage", {
+				title : "AWS Analytics App: Login",
+				showNavButton : false,
+				content : new sap.m.Button({
+					text : "Login with Facebook",
+					press : function () {
+						// this function below first checks login status
+						// and then if needed invokes the FB.login() function to start the login flow
+						FB.getLoginStatus(function(response) {
+		    				statusChangeCallback(response);
+		  				});
+					}
+				})
+			});
+			// create the home page with a back button
+			var home = new sap.m.Page("HomePage", {
+				title : "AWS Analytics App: Home Page",
+				showNavButton : true,
+				navButtonPress : function () {
+					// go back to the previous page
+					// mobileAnalyticsClient.submitEvents(); 
+	    			console.log("Submit Analytics") 
+					app.back();
+				}
+			});
+			// add both pages to the app
+			app.addPage(login).addPage(home);
+			// place the app into the HTML document
+			app.placeAt("content");
+		});
+	</script>
+
+	<script>
+	  // This is called with the results from from FB.getLoginStatus().
+	  function statusChangeCallback(response) {
+	    console.log('statusChangeCallback');
+	    console.log(response);
+	    // The response object is returned with a status field that lets the
+	    // app know the current login status of the person.
+	    // Full docs on the response object can be found in the documentation
+	    // for FB.getLoginStatus().
+	    if (response.status === 'connected') {
+	      // Logged into your app and Facebook.
+	      testAPI();
+	      // ** SD: this line is important for accessing openUI5 elements ** 
+	      sap.ui.getCore().getElementById("AWSAnalyticsApp").to('HomePage');
+	      console.log("FB response=="+JSON.stringify(response));
+
+	    // Initialize Incognito and Mobile Analytics 
+
+		    AWS.config.region = 'us-east-1'; // Region
+			AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+			    IdentityPoolId: 'us-east-1:234g6h98-45hm-0912-0vbg-09984v985jan',
+			    Logins: {
+			        'graph.facebook.com': response.authResponse.accessToken
+      			}
+			});
+
+
+			// Initial options for AWS Mobile Analytics 
+			var options = {
+			    appId : '1c123ac7fc8147cdb13a3b60d9838c83', // Fiori_Test_App
+			    platform: "MacOS", //Required valid values: 'Android', 'iPhoneOS', 'WindowsPhone', 'Blackberry', 'Windows', 'MacOS', 'Linux'
+			    //appTitle : "Fiori_Test_App2",              //Optional e.g. 'Example App'
+			    appVersionName : "v1.0", //Optional e.g. '1.4.1'
+			    appVersionCode : "23", //Optional e.g. '42'
+			    appPackageName : "com.bhp.mobileAnalytics",  //Optional e.g. 'com.amazon.example'
+			    sessionLength: 150000, // timeout of session is set at 2.5 minutes
+			    logger: console 
+			};
+
+			var mobileAnalyticsClient = new AMA.Manager(options);
+			console.log('Analytics initialized');
+			mobileAnalyticsClient.submitEvents(); 
+	     
+		  FB.api('/me', function(response) {
+			console.log('Successful login for: ' + response.name);
+			 new sap.m.Text({
+				  text: "Hello "+ response.name
+			   }).placeAt("content");
+		  });
+
+
+	    } else if (response.status === 'not_authorized') {
+	      // The person is logged into Facebook, but not your app.
+	      document.getElementById('status').innerHTML = 'Please log ' +
+	        'into this app.';
+	    } else {
+	      // The person is not logged into Facebook
+	      // So launch the login flow
+	      FB.login(function(response){
+	      	//After successful login then check the status again.
+		  		statusChangeCallback(response);
+		  });
+	    }
+	    mobileAnalyticsClient.submitEvents(); 
+	    console.log("Submit Analytics") // trying to force submit event on click of login
+	  }
+
+	  // This function is called when someone finishes with the Login
+	  // Button.  See the onlogin handler attached to it in the sample
+	  // code below.
+	  function checkLoginState() {
+	  	console.log("checking login state");
+	    FB.getLoginStatus(function(response) {
+	      statusChangeCallback(response);
+	    });
+	  }
+
+	  window.fbAsyncInit = function() {
+	  FB.init({
+	    appId      : '786543098237629',  // facebook app ID
+	    cookie     : true,  // enable cookies to allow the server to access 
+	                        // the session
+	    xfbml      : true,  // parse social plugins on this page
+	    version    : 'v2.5' // use version 2.5
+	  });
+
+	  // Now that we've initialized the JavaScript SDK, we call 
+	  // FB.getLoginStatus().  This function gets the state of the
+	  // person visiting this page and can return one of three states to
+	  // the callback you provide.  They can be:
+	  //
+	  // 1. Logged into your app ('connected')
+	  // 2. Logged into Facebook, but not your app ('not_authorized')
+	  // 3. Not logged into Facebook and can't tell if they are logged into
+	  //    your app or not.
+	  //
+	  // These three cases are handled in the callback function.
+
+	  // FB.getLoginStatus(function(response) {
+	  //   statusChangeCallback(response);
+	  // });
+
+	  };
+
+	  // Load the SDK asynchronously
+	  (function(d, s, id) {
+	    var js, fjs = d.getElementsByTagName(s)[0];
+	    if (d.getElementById(id)) return;
+	    js = d.createElement(s); js.id = id;
+	    js.src = "//connect.facebook.net/en_US/sdk.js";
+	    fjs.parentNode.insertBefore(js, fjs);
+	  }(document, 'script', 'facebook-jssdk'));
+
+	  // Here we run a very simple test of the Graph API after login is
+	  // successful.  See statusChangeCallback() for when this call is made.
+	  function testAPI() {
+	    console.log('Welcome!  Fetching your information.... ');
+	    FB.api('/me', function(response) {
+	      console.log('Successful login for: ' + response.name);
+	      document.getElementById('status').innerHTML =
+	        'Thanks for logging in, ' + response.name + '!';
+	    });
+	  }
+	</script>
+
+</head>
+
+
+<body class="sapUiBody" id="content">
+
+
+
+<div id="status">
+<!-- <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+</fb:login-button> -->
+
+</div>
+
+</body>
+
+</html>

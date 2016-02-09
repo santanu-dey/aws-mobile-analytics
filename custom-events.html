@@ -1,0 +1,30 @@
+<!-- Load AWS SDK files  -->
+<script src="/js/aws-sdk-mobile-analytics.min.js"></script>
+<script src="/js/aws-sdk-2.2.20.min.js"></script>
+<!-- <script src="https://sdk.amazonaws.com/js/aws-sdk-2.2.20.min.js"></script> -->
+
+<script src="/resources/sap-ui-core.js" type="text/javascript"
+		id="sap-ui-bootstrap"
+		data-sap-ui-theme='sap_bluecrystal'
+    data-sap-ui-libs='sap.m'
+    data-sap-ui-compatVersion='edge'
+    data-sap-ui-preload='async'>
+</script>
+
+
+<script>
+// Create and attach a SAPUI5 view to to the HTML content div. 
+sap.ui.getCore().attachInit(function () {
+    
+    new sap.ui.xmlview({
+		viewName: "sap.ui.aws.demo.App"
+	}).placeAt("content");
+
+
+ });
+
+</script>
+
+<body class='sapUiBody'>
+    <div id='content'></div>
+</body>

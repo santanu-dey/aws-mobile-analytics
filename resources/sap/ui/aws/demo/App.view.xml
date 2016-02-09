@@ -1,0 +1,77 @@
+<mvc:View 
+	id="eventView"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	height="100%"
+	controllerName="sap.m.aws.demo.Event">
+
+	<Page
+		title="Page"
+		class="sapUiContentPadding" >
+		<customHeader>
+			<Toolbar>
+				
+				<ToolbarSpacer/>
+				<Title text="Demo Page for Analytics Event Generation" level="H2"/>
+				<ToolbarSpacer/>
+				
+			</Toolbar>
+
+		</customHeader>
+		<subHeader>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Button id="refresh" icon="sap-icon://log" text="Refresh" width='150px' press="onPress" />
+				<ToolbarSpacer/>
+			</Toolbar>
+
+		</subHeader>
+		<content>
+			<VBox alignItems="Center">
+				<Button type="Emphasized" icon="sap-icon://role" id="user_id" text="Initalize User" width='150px'
+						press="onPress"
+						ariaDescribedBy="defaultButtonDescription genericButtonDescription">
+					<layoutData>
+						<FlexItemData growFactor="1" />
+					</layoutData>
+				</Button>
+				<Button type="Emphasized" icon="sap-icon://employee-rejections" id="anonymous" text="Anonymous User" width='150px'
+						press="onPress"
+						ariaDescribedBy="defaultButtonDescription genericButtonDescription">
+					<layoutData>
+						<FlexItemData growFactor="1" />
+					</layoutData>
+				</Button>
+				<Button icon="sap-icon://complete" id="tx_success" type="Accept" width='150px'
+						text="Tx Success"
+						press="onPress"
+						ariaDescribedBy="acceptButtonDescription genericButtonDescription">
+					<layoutData>
+						<FlexItemData growFactor="1" />
+					</layoutData>
+				</Button>
+				<Button type="Reject" icon="sap-icon://alert" id="tx_error" width='150px'
+						text="Tx Error"
+						press="onPress"
+						ariaDescribedBy="rejectButtonDescription genericButtonDescription">
+					<layoutData>
+						<FlexItemData growFactor="1" />
+					</layoutData>
+			    </Button>
+				<Button type="Default" icon="sap-icon://iphone-2" id="device_info" text="Device Info" width='150px' press="onPress" />
+				<Button text="Location" icon="sap-icon://world" id="device_location" width='150px' press="onPress" />
+				<Button icon="sap-icon://stop" text="End Session" id="end_session" width='150px' press="onPress" />
+
+			</VBox>
+
+		</content>
+		<footer>
+			<Toolbar >
+			<!-- <ToolbarSpacer/> -->
+				<Label id="genericButtonDescription" text="Note: There can be a delay before the events are dispatched"/>
+				
+			</Toolbar>
+		</footer>
+	</Page>
+</mvc:View>
